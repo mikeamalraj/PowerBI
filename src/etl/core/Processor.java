@@ -76,7 +76,7 @@ public class Processor {
 	
 	/** The message method prints information about the command line arguments that needs to be passed while running the program.*/ 
 	private static void message() {
-		System.out.println("************ ETL Process *************");
+		System.out.println("************ ETL Process git **************");
 		System.out.println("Arguments needs to be valid!");
 		System.out.println("Monthly Jobs Needs below arguments\n" + "	--Monthly 'Runs Monthly taks'\n"
 				+ "	--ResourceFileLocation 'Specify Location of Property_Files'\n " + "	--Job 'Specify Job Name'\n" + "	--InputFileLocation 'Specify the location of input files'\n");
@@ -288,11 +288,14 @@ public class Processor {
 			
 			/** Reading each line in loop from the file and inserting the same into the table*/
 			while ((line = br.readLine()) != null) {
-				if (isMonthly && lineNumber == 0) {
+				if ((isMonthly && lineNumber == 0)||(taskName.contains("UBUP") && lineNumber < 19)) {
 					lineNumber++;
 					continue;
+				}else if (taskName.contains("UBUP") && line.startsWith("Total"))
+				{
+					break;
 				}
-				
+				line = line.replaceAll(new String("Â".getBytes("UTF-8"), "UTF-8"), "").replaceAll(new String(" ,"), ",");
 				String query = "INSERT INTO " + tableProperties.getProperty(taskName + "_Name") + " values ("
 						+ dumpData(resourceFileLocation, config.getProperty(taskName + "_Table"), line,
 								tableProperties.getProperty(taskName + "_Delimiter"),

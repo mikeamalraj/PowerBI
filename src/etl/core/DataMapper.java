@@ -72,7 +72,7 @@ public class DataMapper {
 				if (info[1].contains("int") || info[1].contains("double"))
 					values = values + "0";
 				else
-					values = values + "''";
+					values = values + "'NULL'";
 			}
 			if (i != columnDefArray.length - 1) {
 				values = values + Constants.DELIMITER_COMMA;
