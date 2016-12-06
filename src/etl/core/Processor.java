@@ -271,7 +271,7 @@ public class Processor {
 			String columnName = tableProperties.getProperty(taskName + "_Columns");
 			columnName = columnName.replace("|", ",");
 			String create_stmt;
-			if (taskName.equals("VIP"))
+			if (taskName.equals("VIP")||taskName.equals("UBUP")||taskName.equals("DREP"))
 			{
 				create_stmt = "DROP TABLE if exists " + tableProperties.getProperty(taskName + "_Name");
 				Statement stmt = connection.createStatement();
@@ -288,7 +288,7 @@ public class Processor {
 			
 			/** Reading each line in loop from the file and inserting the same into the table*/
 			while ((line = br.readLine()) != null) {
-				if ((isMonthly && lineNumber == 0)||(taskName.contains("UBUP") && lineNumber < 19)) {
+				if ((isMonthly && lineNumber == 0)||(taskName.contains("UBUP") && lineNumber < 19)||(taskName.contains("DREP") && lineNumber < 14)) {
 					lineNumber++;
 					continue;
 				}else if (taskName.contains("UBUP") && line.startsWith("Total"))
