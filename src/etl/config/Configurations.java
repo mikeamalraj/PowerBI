@@ -3,10 +3,8 @@ package etl.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.File;

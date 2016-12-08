@@ -24,6 +24,7 @@ public class Processor {
 			/** Initializing all variables */
 			boolean isMonthly = false;
 			boolean isDaily = false;
+			boolean isCluster = false;
 			String resourceFileLocation = Constants.EMPTY;
 			String job = Constants.EMPTY;
 			String sourceDirectory = Constants.EMPTY;
@@ -38,6 +39,10 @@ public class Processor {
 				case "--Daily":
 				case "--daily":
 					isDaily = true;
+					break;
+				case "--Cluster":
+				case "--cluster":
+					isCluster = true;
 					break;
 				case "--ResourceFileLocation":
 				case "-resourcefilelocation":
@@ -67,7 +72,7 @@ public class Processor {
 			/**	System.out.println((isMonthly ? "Monthly" : "Daily") + " Job Details");
 				System.out.println("Resource File : " + resourceFileLocation);
 				System.out.println("Job List: " + job); */
-				p.execute(isMonthly, resourceFileLocation, job, sourceDirectory);
+				p.execute(isMonthly,isCluster, resourceFileLocation, job, sourceDirectory);
 			} else {
 				message();
 			}
@@ -76,21 +81,21 @@ public class Processor {
 	
 	/** The message method prints information about the command line arguments that needs to be passed while running the program.*/ 
 	private static void message() {
-		System.out.println("************ ETL Process git **************");
-		System.out.println("Arguments needs to be valid!");
+		System.out.println("************ ETL Process **************\n");
+		System.out.println("Arguments needs to be valid!\n\n");
 		System.out.println("Monthly Jobs Needs below arguments\n" + "	--Monthly 'Runs Monthly taks'\n"
-				+ "	--ResourceFileLocation 'Specify Location of Property_Files'\n " + "	--Job 'Specify Job Name'\n" + "	--InputFileLocation 'Specify the location of input files'\n");
-		System.out.println("Example: java -jar Alpha_2Mysql.jar --Monthly --ResourceFileLocation '/home/vmuser1192/Project/Alpha/resources/' --Job AWS  --InputFileLocation '/home/vmuser1192/Project/RDD/'\n");
+				+ "	--ResourceFileLocation 'Specify Location of Property_Files'\n " + "	--Job 'Specify Job Name'\n" + "	--InputFileLocation 'Specify the location of input files'\n" + "	--Cluster 'Specify if job is executed in cluster'\n");
+		System.out.println("Example: java -jar Alpha_2Mysql.jar --Monthly --ResourceFileLocation D:\\MyProjects\\Alpha\\resources\\ --Cluster --Job AWS '\n");
 		System.out.println("Daily Jobs Needs below arguments\n" + "	--Daily 'Runs Daily job' \n"
-				+ "	--ResourceFileLocation 'Specify Location of Property Files'\n" + "	--Job 'Specify Job Name' \n" + "	--InputFileLocation 'Specify the location of input files'\n");
+				+ "	--ResourceFileLocation 'Specify Location of Property Files'\n" + "	--Job 'Specify Job Name' \n" + "	--InputFileLocation 'Specify the location of input files'\n"+ "	--Cluster 'Specify if job is executed in cluster'\n");
 		
-		System.out.println("Example: java -jar Alpha_2Mysql.jar --Daily --ResourceFileLocation '/home/vmuser1192/Project/Alpha/resources/' --Job VIP --InputFileLocation '/home/vmuser1192/Project/Daily/' \n");
+		System.out.println("Example: java -jar Alpha_2Mysql.jar --Daily --ResourceFileLocation D:\\MyProjects\\Alpha\\resources\\ --Job DREP \n");
 		System.out.println("************ ETL Process *************");
 	}
 	
 	/** The execute method reads configuration files, basic properties and calls processTask method for further execution.*/
 	
-	private void execute(boolean isMonthly, String resourceFileLocation, String job, String sourceDirectory) throws Exception {
+	private void execute(boolean isMonthly, boolean isCluster, String resourceFileLocation, String job, String sourceDirectory) throws Exception {
 		Connection connection = null;
 		try {
 			Configurations configurations = new Configurations();
@@ -120,10 +125,11 @@ public class Processor {
 					for (String mT : monthlyTask) {
 						int returnCode = -1;
 						try {
-							sourceDirectory = sourceDirectory.isEmpty() ? config.get("rddLocation").toString()
-									: sourceDirectory;
-							returnCode = processTask(resourceFileLocation, sourceDirectory, mT, config, true,
-									connection);
+							if(isCluster)
+								sourceDirectory = sourceDirectory.isEmpty() ? config.get("rddLocationC").toString(): sourceDirectory;
+							else
+								sourceDirectory = sourceDirectory.isEmpty() ? config.get("rddLocation").toString(): sourceDirectory;
+							returnCode = processTask(resourceFileLocation, sourceDirectory, mT, config, true,connection);
 						} catch (Exception e) {
 							throw e;
 						}
@@ -147,10 +153,11 @@ public class Processor {
 					for (String dT : dailyTask) {
 						int returnCode = -1;
 						try {
-							sourceDirectory = sourceDirectory.isEmpty() ? config.get("dailyLocation").toString()
-									: sourceDirectory;
-							returnCode = processTask(resourceFileLocation, sourceDirectory, dT, config, false,
-									connection);
+							if(isCluster)
+								sourceDirectory = sourceDirectory.isEmpty() ? config.get("dailyLocationC").toString(): sourceDirectory;
+							else
+								sourceDirectory = sourceDirectory.isEmpty() ? config.get("dailyLocation").toString(): sourceDirectory;	
+							returnCode = processTask(resourceFileLocation, sourceDirectory, dT, config, false,connection);
 						} catch (Exception e) {
 							throw e;
 						}
@@ -369,7 +376,4 @@ public class Processor {
 				br.close();
 		}
 	}
-	
-	
-	
 }
