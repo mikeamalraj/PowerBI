@@ -302,6 +302,9 @@ public class Processor {
 				{
 					break;
 				}
+				if (line.contains("\"")){
+					line = replaceQuotes(line);
+				}
 				line = line.replaceAll(new String("Â".getBytes("UTF-8"), "UTF-8"), "").replaceAll(new String(" ,"), ",");
 				String query = "INSERT INTO " + tableProperties.getProperty(taskName + "_Name") + " values ("
 						+ dumpData(resourceFileLocation, config.getProperty(taskName + "_Table"), line,
@@ -375,5 +378,23 @@ public class Processor {
 			if (br != null)
 				br.close();
 		}
+	}
+	String replaceQuotes(String line)
+	{
+		String arr[] = line.split("\"");
+		String Final= "";
+		int j=1;
+		for(int i=0;i<arr.length;i++)
+		{	
+			if (j%2==1)
+			{
+				Final = Final + arr[i];
+			}
+			else{
+				Final = Final + arr[i].replaceAll(",", "");
+			}
+			j++;
+		}
+		return Final;
 	}
 }
